@@ -2,64 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>D3 Bar Chart</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/mainpage-style.css" />
   </head>
   <body>
-    <svg width="500" height="300"></svg>
+    <img id="avatar" , src="images/pp.jpg" alt="Avatar of Ekaterina" />
+    <div id="hero-section">
+      <h1>Hello, I'm Ekaterina</h1>
+      <p class="running-subtitle">
+        NMR spectroscopist | Data scientist | Software Engineer
+      </p>
+      <p class="description">
+        Organic chemist by training, I have always been drawn to untighing complex data and extracting meaningful insights. With a background in NMR spectroscopy, I have honed my skills in data analysis and visualization, which has naturally led me to the world of data science and software engineering.
+      </p>
+       <div class="social-buttons" style="text-align:center; margin-top:16px;">
+         <a class="social-button" href="https://www.linkedin.com/in/ekaterina-burakova/" id="linkedin-btn">
+          <svg width="36" height="36" viewBox="0 0 16 16" area-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M 0 1.146 C 0 0.513 0.526 0 1.175 0 L 14.825 0 C 15.474 0 16 0.513 16 1.146 L 16 14.854 C 16 15.487 15.474 16 14.825 16 L 1.175 16 C 0.526 16 0 15.487 0 14.854 Z M 4.943 13.394 L 4.943 6.169 L 2.542 6.169 L 2.542 13.394 Z M 3.743 5.182 C 4.58 5.182 5.101 4.628 5.101 3.934 C 5.086 3.225 4.581 2.686 3.759 2.686 C 2.937 2.686 2.4 3.226 2.4 3.934 C 2.4 4.628 2.921 5.182 3.727 5.182 Z M 8.651 13.394 L 8.651 9.359 C 8.651 9.143 8.667 8.927 8.731 8.773 C 8.904 8.342 9.299 7.895 9.963 7.895 C 10.832 7.895 11.179 8.557 11.179 9.529 L 11.179 13.394 L 13.58 13.394 L 13.58 9.25 C 13.58 7.03 12.396 5.998 10.816 5.998 C 9.542 5.998 8.971 6.698 8.651 7.191 L 8.651 7.216 L 8.635 7.216 L 8.651 7.191 L 8.651 6.169 L 6.251 6.169 C 6.281 6.847 6.251 13.394 6.251 13.394 Z"
+            >
+          </path>
+          </svg>
+          </a>
+         <a class="social-button" href="https://github.com/eburakova/eburakova" id="github-btn">
+          <svg width="36" height="36" viewBox="0 0 16 16" area-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M 8 0 C 3.58 0 0 3.58 0 8 C 0 11.54 2.29 14.53 5.47 15.59 C 5.87 15.66 6.02 15.42 6.02 15.21 C 6.02 15.02 6.01 14.39 6.01 13.72 C 4 14.09 3.48 13.23 3.32 12.78 C 3.23 12.55 2.84 11.84 2.5 11.65 C 2.22 11.5 1.82 11.13 2.49 11.12 C 3.12 11.11 3.57 11.7 3.72 11.94 C 4.44 13.15 5.59 12.81 6.05 12.6 C 6.12 12.08 6.33 11.73 6.56 11.53 C 4.78 11.33 2.92 10.64 2.92 7.58 C 2.92 6.71 3.23 5.99 3.74 5.43 C 3.66 5.23 3.38 4.41 3.82 3.31 C 3.82 3.31 4.49 3.1 6.02 4.13 C 6.66 3.95 7.34 3.86 8.02 3.86 C 8.7 3.86 9.38 3.95 10.02 4.13 C 11.55 3.09 12.22 3.31 12.22 3.31 C 12.66 4.41 12.38 5.23 12.3 5.43 C 12.81 5.99 13.12 6.7 13.12 7.58 C 13.12 10.65 11.25 11.33 9.47 11.53 C 9.76 11.78 10.01 12.26 10.01 13.01 C 10.01 14.08 10 14.94 10 15.21 C 10 15.42 10.15 15.67 10.55 15.59 C 13.807 14.4914 16 11.4373 16 8 C 16 3.58 12.42 0 8 0"
+            >
+          </path>
+          </svg>
+         </a>
+       </div>
+    </div>
+    <div id="plot-container">
+      <svg id="plot" width="900" height="800"></svg>
+    </div>
+    <!-- <div class="tooltip" id="tooltip"></div>  -->
+    <script src="plot_hsqc.js"></script>
 
-    <script>
-      const data = [
-        { name: "A", value: 1 },
-        { name: "B", value: 5 },
-        { name: "C", value: 8 },
-        { name: "D", value: 10 },
-      ];
-
-      const svg = d3.select("svg");
-      const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-      const width = +svg.attr("width") - margin.left - margin.right;
-      const height = +svg.attr("height") - margin.top - margin.bottom;
-
-      const chart = svg
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
-      // X scale
-      const x = d3
-        .scaleBand()
-        .domain(data.map((d) => d.name))
-        .range([0, width])
-        .padding(0.2);
-
-      // Y scale
-      const y = d3
-        .scaleLinear()
-        .domain([0, d3.max(data, (d) => d.value)])
-        .nice()
-        .range([height, 0]);
-
-      // X axis
-      chart
-        .append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x));
-
-      // Y axis
-      chart.append("g").call(d3.axisLeft(y));
-
-      // Bars
-      chart
-        .selectAll(".bar")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", (d) => x(d.name))
-        .attr("y", (d) => y(d.value))
-        .attr("width", x.bandwidth())
-        .attr("height", (d) => height - y(d.value));
-    </script>
   </body>
+
+
+  </html>
 </html>

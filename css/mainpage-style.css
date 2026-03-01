@@ -7,7 +7,7 @@
   padding: 100px 20px;
   margin: 16px;
   background-color: rgba(247, 251, 253, 0.85);
-  border-radius: 10%;
+  border-radius: 20px;
   color: #333;
   z-index: 2;
 }
@@ -21,7 +21,7 @@
 .description {
   max-width: 600px;
   margin-top: 20px;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.5;
 }
 .running-subtitle {
@@ -29,6 +29,26 @@
   color: #555;
   margin-top: 10px;
   font-family: "Courier New", Courier, monospace;
+}
+
+.social-buttons {
+  display: inline-flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}
+.social-button {
+  display: inline-block;
+  padding: 8px 8px;
+  background: #c0c0c0;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.social-button:hover {
+  background: #e1e8f2;
 }
 
 /* Make the SVG cover the viewport and be a background */
