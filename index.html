@@ -3,87 +3,136 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>D3 Bar Chart</title>
+    <title>Ekaterina Burkova | Personal Page</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="css/mainpage-style.css" />
   </head>
+
   <body>
-    <img id="avatar" src="images/pp.jpg" alt="Avatar of Ekaterina" />
-    <div id="hero-card">
-      <h1>Ekaterina Burakova</h1>
-      <p class="running-subtitle">
-        NMR spectroscopist | Data scientist | Software Engineer
-      </p>
-      <p class="description">
-        <ul>
-           <li> Scientific consultant, software engineer and data practicioner</li>
-           <li> Based in Bremen, Germany</li>
-           <li> Open to freelance gigs</li>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <ul class="nav-links">
+          <li><a href="index.html" class="active">About</a></li>
+          <!-- <li><a href="#projects">Projects</a></li> -->
         </ul>
-      </p>
-      <div class="social-buttons" style="text-align: center; margin-top: 16px">
-        <a
-          class="social-button"
-          href="https://www.linkedin.com/in/ekaterina-burakova/"
-          id="linkedin-btn"
-        >
-          <svg
-            width="36"
-            height="36"
-            viewBox="0 0 16 16"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            preserveAspectRatio="xMidYMid meet"
+        <div class="nav-actions">
+          <!-- Placeholder for potential future actions like dark mode toggle or CTA -->
+        </div>
+      </div>
+    </nav>
+    <div id="hero-card">
+      <img id="avatar" src="images/pp.jpg" alt="Avatar of Ekaterina" />
+      <div class="hero-content">
+        <h1>Ekaterina Burakova</h1>
+        <p class="running-subtitle">
+          NMR scientist | Structural biologist
+          <br>
+          Data scientist | Software Engineer
+        </p>
+        <div class="description">
+          <p><span role="img" aria-label="location marker">&#128205;</span> Based in Bremen, Germany 🇩🇪</p>
+        </div>
+        <div class="social-buttons" style="margin-top: 16px">
+          <a
+            class="social-button"
+            href="https://www.linkedin.com/in/ekaterina-burakova/"
+            id="linkedin-btn"
           >
-            <path
-              d="M 0 1.146 C 0 0.513 0.526 0 1.175 0 L 14.825 0 C 15.474 0 16 0.513 16 1.146 L 16 14.854 C 16 15.487 15.474 16 14.825 16 L 1.175 16 C 0.526 16 0 15.487 0 14.854 Z M 4.943 13.394 L 4.943 6.169 L 2.542 6.169 L 2.542 13.394 Z M 3.743 5.182 C 4.58 5.182 5.101 4.628 5.101 3.934 C 5.086 3.225 4.581 2.686 3.759 2.686 C 2.937 2.686 2.4 3.226 2.4 3.934 C 2.4 4.628 2.921 5.182 3.727 5.182 Z M 8.651 13.394 L 8.651 9.359 C 8.651 9.143 8.667 8.927 8.731 8.773 C 8.904 8.342 9.299 7.895 9.963 7.895 C 10.832 7.895 11.179 8.557 11.179 9.529 L 11.179 13.394 L 13.58 13.394 L 13.58 9.25 C 13.58 7.03 12.396 5.998 10.816 5.998 C 9.542 5.998 8.971 6.698 8.651 7.191 L 8.651 7.216 L 8.635 7.216 L 8.651 7.191 L 8.651 6.169 L 6.251 6.169 C 6.281 6.847 6.251 13.394 6.251 13.394 Z"
-            ></path>
-          </svg>
-        </a>
-        <a
-          class="social-button"
-          href="https://github.com/eburakova/eburakova"
-          id="github-btn"
-        >
-          <svg
-            width="36"
-            height="36"
-            viewBox="0 0 16 16"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            preserveAspectRatio="xMidYMid meet"
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                d="M 0 1.146 C 0 0.513 0.526 0 1.175 0 L 14.825 0 C 15.474 0 16 0.513 16 1.146 L 16 14.854 C 16 15.487 15.474 16 14.825 16 L 1.175 16 C 0.526 16 0 15.487 0 14.854 Z M 4.943 13.394 L 4.943 6.169 L 2.542 6.169 L 2.542 13.394 Z M 3.743 5.182 C 4.58 5.182 5.101 4.628 5.101 3.934 C 5.086 3.225 4.581 2.686 3.759 2.686 C 2.937 2.686 2.4 3.226 2.4 3.934 C 2.4 4.628 2.921 5.182 3.727 5.182 Z M 8.651 13.394 L 8.651 9.359 C 8.651 9.143 8.667 8.927 8.731 8.773 C 8.904 8.342 9.299 7.895 9.963 7.895 C 10.832 7.895 11.179 8.557 11.179 9.529 L 11.179 13.394 L 13.58 13.394 L 13.58 9.25 C 13.58 7.03 12.396 5.998 10.816 5.998 C 9.542 5.998 8.971 6.698 8.651 7.191 L 8.651 7.216 L 8.635 7.216 L 8.651 7.191 L 8.651 6.169 L 6.251 6.169 C 6.281 6.847 6.251 13.394 6.251 13.394 Z"
+              ></path>
+            </svg>
+          </a>
+          <a
+            class="social-button"
+            href="https://github.com/eburakova/eburakova"
+            id="github-btn"
           >
-            <path
-              d="M 8 0 C 3.58 0 0 3.58 0 8 C 0 11.54 2.29 14.53 5.47 15.59 C 5.87 15.66 6.02 15.42 6.02 15.21 C 6.02 15.02 6.01 14.39 6.01 13.72 C 4 14.09 3.48 13.23 3.32 12.78 C 3.23 12.55 2.84 11.84 2.5 11.65 C 2.22 11.5 1.82 11.13 2.49 11.12 C 3.12 11.11 3.57 11.7 3.72 11.94 C 4.44 13.15 5.59 12.81 6.05 12.6 C 6.12 12.08 6.33 11.73 6.56 11.53 C 4.78 11.33 2.92 10.64 2.92 7.58 C 2.92 6.71 3.23 5.99 3.74 5.43 C 3.66 5.23 3.38 4.41 3.82 3.31 C 3.82 3.31 4.49 3.1 6.02 4.13 C 6.66 3.95 7.34 3.86 8.02 3.86 C 8.7 3.86 9.38 3.95 10.02 4.13 C 11.55 3.09 12.22 3.31 12.22 3.31 C 12.66 4.41 12.38 5.23 12.3 5.43 C 12.81 5.99 13.12 6.7 13.12 7.58 C 13.12 10.65 11.25 11.33 9.47 11.53 C 9.76 11.78 10.01 12.26 10.01 13.01 C 10.01 14.08 10 14.94 10 15.21 C 10 15.42 10.15 15.67 10.55 15.59 C 13.807 14.4914 16 11.4373 16 8 C 16 3.58 12.42 0 8 0"
-            ></path>
-          </svg>
-        </a>
-        <a
-          class="social-button"
-          href="https://www.researchgate.net/profile/Ekaterina-Burakova-3"
-          id="research-gate-btn"
-        >
-          <svg
-            width="36"
-            height="36"
-            viewBox="0 0 200 200"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            preserveAspectRatio="xMidYMid meet"
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                d="M 8 0 C 3.58 0 0 3.58 0 8 C 0 11.54 2.29 14.53 5.47 15.59 C 5.87 15.66 6.02 15.42 6.02 15.21 C 6.02 15.02 6.01 14.39 6.01 13.72 C 4 14.09 3.48 13.23 3.32 12.78 C 3.23 12.55 2.84 11.84 2.5 11.65 C 2.22 11.5 1.82 11.13 2.49 11.12 C 3.12 11.11 3.57 11.7 3.72 11.94 C 4.44 13.15 5.59 12.81 6.05 12.6 C 6.12 12.08 6.33 11.73 6.56 11.53 C 4.78 11.33 2.92 10.64 2.92 7.58 C 2.92 6.71 3.23 5.99 3.74 5.43 C 3.66 5.23 3.38 4.41 3.82 3.31 C 3.82 3.31 4.49 3.1 6.02 4.13 C 6.66 3.95 7.34 3.86 8.02 3.86 C 8.7 3.86 9.38 3.95 10.02 4.13 C 11.55 3.09 12.22 3.31 12.22 3.31 C 12.66 4.41 12.38 5.23 12.3 5.43 C 12.81 5.99 13.12 6.7 13.12 7.58 C 13.12 10.65 11.25 11.33 9.47 11.53 C 9.76 11.78 10.01 12.26 10.01 13.01 C 10.01 14.08 10 14.94 10 15.21 C 10 15.42 10.15 15.67 10.55 15.59 C 13.807 14.4914 16 11.4373 16 8 C 16 3.58 12.42 0 8 0"
+              ></path>
+            </svg>
+          </a>
+          <a
+            class="social-button"
+            href="https://www.researchgate.net/profile/Ekaterina-Burakova-3"
+            id="research-gate-btn"
           >
-            <path
-              d="M 160.2 0.25 c 14.25 0 23.75 7.65 28.1 18.2 l -11.5 4.7 c -2.75 -7.2 -8.45 -11.35 -16.6 -11.35 a 16.76 16.76 0 0 0 -12.3 5.25 c -4.05 4.5 -5.05 9.3 -5.05 26.25 s 0.95 21.85 5.05 26.35 a 16.57 16.57 0 0 0 12.3 5.1 a 17.64 17.64 0 0 0 13.6 -5.95 c 3.05 -3.55 4.2 -7.85 4.2 -13.3 v -4.75 h -16.2 V 39.8 h 28.9 v 12.95 c 0 10.9 -2 17.9 -7.5 23.9 c -6.35 6.75 -14.2 9.6 -23 9.6 a 30.15 30.15 0 0 1 -21.9 -9.05 c -8.102 -8.2 -8.101 -17.426 -8.1 -33.368 v -1.164 c -0.001 -15.943 -0.002 -25.217 8.1 -33.418 a 29.48 29.48 0 0 1 21.9 -9 M 58 136 a 368 368 0 0 0 37.05 56.45 a 42.1 42.1 0 0 0 14.767 10.758 a 42.1 42.1 0 0 0 17.933 3.492 a 31.6 31.6 0 0 0 11.4 -1.95 v -6.4 A 36.22 36.22 0 0 1 115 185.3 A 294.6 294.6 0 0 1 78 133 a 45.286 45.286 0 0 0 34.7 -42.1 c 0 -27.65 -21.75 -40.45 -49.55 -40.45 c -8.04 0 -15.433 0.226 -22.104 0.43 c -5.484 0.167 -10.48 0.32 -14.946 0.32 H 0.15 v 7.2 l 9.25 1.65 c 6.45 1.2 10.15 3.9 10.45 19.55 v 97.6 c 0 15.3 -3.7 18.25 -10.1 19.45 L 0.5 198.4 v 7.15 c 6.65 -0.3 18.65 -0.75 29.8 -0.75 c 6.41 0 13.876 0.248 20.225 0.459 c 4.697 0.155 8.781 0.291 11.375 0.291 v -7.15 l -12.8 -1.75 c -6.7 -0.95 -10.2 -4.15 -10.2 -19.45 V 136 Z m 0.6 -74.25 c 20.75 0 33.05 10.85 33.05 30.55 c 0 19.45 -13.35 32.6 -35.25 32.15 c -8.237 0 -11.787 -0.278 -17.177 -0.701 l -0.623 -0.049 V 61.75 Z"
-            ></path>
-          </svg>
-        </a>
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 200 200"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                d="M 160.2 0.25 c 14.25 0 23.75 7.65 28.1 18.2 l -11.5 4.7 c -2.75 -7.2 -8.45 -11.35 -16.6 -11.35 a 16.76 16.76 0 0 0 -12.3 5.25 c -4.05 4.5 -5.05 9.3 -5.05 26.25 s 0.95 21.85 5.05 26.35 a 16.57 16.57 0 0 0 12.3 5.1 a 17.64 17.64 0 0 0 13.6 -5.95 c 3.05 -3.55 4.2 -7.85 4.2 -13.3 v -4.75 h -16.2 V 39.8 h 28.9 v 12.95 c 0 10.9 -2 17.9 -7.5 23.9 c -6.35 6.75 -14.2 9.6 -23 9.6 a 30.15 30.15 0 0 1 -21.9 -9.05 c -8.102 -8.2 -8.101 -17.426 -8.1 -33.368 v -1.164 c -0.001 -15.943 -0.002 -25.217 8.1 -33.418 a 29.48 29.48 0 0 1 21.9 -9 M 58 136 a 368 368 0 0 0 37.05 56.45 a 42.1 42.1 0 0 0 14.767 10.758 a 42.1 42.1 0 0 0 17.933 3.492 a 31.6 31.6 0 0 0 11.4 -1.95 v -6.4 A 36.22 36.22 0 0 1 115 185.3 A 294.6 294.6 0 0 1 78 133 a 45.286 45.286 0 0 0 34.7 -42.1 c 0 -27.65 -21.75 -40.45 -49.55 -40.45 c -8.04 0 -15.433 0.226 -22.104 0.43 c -5.484 0.167 -10.48 0.32 -14.946 0.32 H 0.15 v 7.2 l 9.25 1.65 c 6.45 1.2 10.15 3.9 10.45 19.55 v 97.6 c 0 15.3 -3.7 18.25 -10.1 19.45 L 0.5 198.4 v 7.15 c 6.65 -0.3 18.65 -0.75 29.8 -0.75 c 6.41 0 13.876 0.248 20.225 0.459 c 4.697 0.155 8.781 0.291 11.375 0.291 v -7.15 l -12.8 -1.75 c -6.7 -0.95 -10.2 -4.15 -10.2 -19.45 V 136 Z m 0.6 -74.25 c 20.75 0 33.05 10.85 33.05 30.55 c 0 19.45 -13.35 32.6 -35.25 32.15 c -8.237 0 -11.787 -0.278 -17.177 -0.701 l -0.623 -0.049 V 61.75 Z"
+              ></path>
+            </svg>
+          </a>
+          <a
+            class="social-button"
+            href="mailto:burakova.ek@gmail.com"
+            id="mailto-btn"
+          >
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.294 6.617L10 9.183 8.357 10.17a.714.714 0 0 1-.714 0L6 9.183l-4.706 2.817A1 1 0 0 0 2 13h12a1 1 0 0 0 .706-.294ZM1 11.105l4.708-2.897L1 5.383v5.722Z"
+              ></path>
+            </svg>
+          </a>
+          <!--<path
+                fill-rule="evenodd"
+                d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4Zm10 5a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm0 3a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm0 3a1 1 0 0 1 1-1h3a1 1 0 1 1 0 2h-3a1 1 0 0 1-1-1Zm-8-5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm1.942 4a3 3 0 0 0-2.847 2.051l-.044.133-.004.012c-.042.126-.055.167-.042.195.006.013.02.023.038.039.032.025.08.064.146.155A1 1 0 0 0 6 17h6a1 1 0 0 0 .811-.415.713.713 0 0 1 .146-.155c.019-.016.031-.026.038-.04.014-.027 0-.068-.042-.194l-.004-.012-.044-.133A3 3 0 0 0 10.059 14H7.942Z"
+                clip-rule="evenodd" /> -->
+        </div>
       </div>
     </div>
     <div id="plot-container">
       <svg id="plot" width="900" height="800"></svg>
     </div>
     <script src="src/plot_hsqc.js"></script>
+    <script>
+      window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+    </script>
+
   </body>
+
+
 </html>
