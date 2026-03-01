@@ -15,13 +15,7 @@ d3.select("#plot")
     "viewBox",
     `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`,
   )
-  .attr("preserveAspectRatio", "xMidYMid slice")
-  .style("width", "100vw")
-  .style("height", "100vh")
-  .style("position", "fixed")
-  .style("left", "0")
-  .style("top", "0")
-  .style("z-index", "-1");
+  .attr("preserveAspectRatio", "xMidYMid slice");
 //  .style("pointer-events", "none");
 // const tooltip = d3.select("#tooltip");
 

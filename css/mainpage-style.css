@@ -41,15 +41,20 @@
 }
 .social-button {
   display: inline-block;
-  padding: 8px 8px;
-  background: #c0c0c0;
+  padding: 5px 5px;
+  background: none;
   color: white;
   text-decoration: none;
   border-radius: 6px;
   font-weight: 600;
 }
 .social-button:hover {
-  background: #e1e8f2;
+  background: #ddd;
+}
+svg {
+  font-size: 12px;
+  color: #555;
+  border-color: #444;
 }
 
 /* Make the SVG cover the viewport and be a background */
@@ -58,8 +63,14 @@
   inset: 0; /* top:0; right:0; bottom:0; left:0; */
   width: 100vw;
   height: 100vh;
-  z-index: -1; /* behind page content */
-  /* pointer-events: none; /* let clicks pass through */
+  z-index: 0; /* behind page content but above page background */
+  pointer-events: none; /* let clicks pass through by default */
+}
+
+/* Allow interaction only on visible contour strokes */
+.contour {
+  pointer-events: visibleStroke;
+  cursor: pointer;
 }
 
 /* Bring the UI/content on top */
@@ -77,9 +88,7 @@ body {
   margin: 0;
   background-color: #f5f5f5;
 }
-svg {
-  font-size: 12px;
-}
+
 .axis {
   font-size: 11px;
 }
