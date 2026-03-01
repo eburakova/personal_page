@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>D3 Bar Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <svg width="500" height="300"></svg>
+
+    <script>
+      const data = [
+        { name: "A", value: 1 },
+        { name: "B", value: 5 },
+        { name: "C", value: 8 },
+        { name: "D", value: 10 },
+      ];
+
+      const svg = d3.select("svg");
+      const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+      const width = +svg.attr("width") - margin.left - margin.right;
+      const height = +svg.attr("height") - margin.top - margin.bottom;
+
+      const chart = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      // X scale
+      const x = d3
+        .scaleBand()
+        .domain(data.map((d) => d.name))
+        .range([0, width])
+        .padding(0.2);
+
+      // Y scale
+      const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, (d) => d.value)])
+        .nice()
+        .range([height, 0]);
+
+      // X axis
+      chart
+        .append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+      // Y axis
+      chart.append("g").call(d3.axisLeft(y));
+
+      // Bars
+      chart
+        .selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d) => x(d.name))
+        .attr("y", (d) => y(d.value))
+        .attr("width", x.bandwidth())
+        .attr("height", (d) => height - y(d.value));
+    </script>
+  </body>
+</html>
