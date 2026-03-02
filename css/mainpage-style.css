@@ -171,8 +171,26 @@
   font-size: 14px;
   color: #555;
   margin-top: 4px;
-    font-family: var(--font-mono), monospace;
+  font-family: var(--font-mono), monospace;
   font-weight: bold;
+  display: grid;
+  grid-template-columns: min-content min-content auto;
+  gap: 0 10px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.sub-left {
+  text-align: left;
+}
+
+.sub-sep {
+  color: #999;
+  font-weight: bold;
+}
+
+.sub-right {
+  text-align: left;
 }
 
 .description p {
@@ -315,7 +333,7 @@ main {
 .attributions {
     text-align: left;
     font-style: italic;
-    font-size: 0.8em;
+    font-size: 0.7em;
     font-family: var(--font-family), serif;
 }
 /* Mobile Responsive Adjustments */
