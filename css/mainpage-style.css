@@ -12,7 +12,7 @@
     --bg-card: #ffffff;
     --text: #404040;
     --text-heading: #0a0a0a;
-    --text-background: #e0e0e0;
+    --text-background: #dfdfdf;
     --text-muted: #717171;
     --border: #e5e5e5;
     --border-light: #f5f5f5;
@@ -27,6 +27,7 @@
     --font-family: "Inter", sans-serif;
     --font-mono: "Courier New", Courier, monospace;
     --font-sans: "Inter", sans-serif;
+    background-color: #f5f5f5; /* base color for the whole document */
 }
 
 .navbar {
@@ -169,7 +170,7 @@
   font-size: 14px;
   color: #555;
   margin-top: 4px;
-  font-family: var(--font-mono);
+    font-family: var(--font-mono), monospace;
   font-weight: bold;
 }
 
@@ -194,15 +195,12 @@
 .social-button:hover {
   background: #ddd;
 }
-svg {
-  font-size: 12px;
-  color: #555;
-  border-color: #444;
-}
 
 .svg-icon {
   width: 25px;
   height: 25px;
+  color: #555;
+  border-color: #444;
 }
 
 /* Make the SVG cover the viewport and be a background */
@@ -232,7 +230,7 @@ svg {
 }
 
 body {
-  font-family: var(--font-sans);
+    font-family: var(--font-sans), serif;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -251,9 +249,6 @@ main {
   width: 100%;
 }
 
-:root {
-  background-color: #f5f5f5; /* base color for the whole document */
-}
 
 * {
   box-sizing: border-box;
@@ -264,12 +259,6 @@ main {
   stroke: #2f8fd3;
   stroke-width: 1.5;
   opacity: 0.7;
-}
-.peak {
-  fill: none;
-  stroke: var(--text-background);
-  stroke-width: 2;
-  opacity: 0.8;
 }
 .peak-x-1, .peak-x-2 {
   stroke: var(--text-background);
@@ -296,17 +285,13 @@ main {
   pointer-events: none;
   user-select: none;
 }
-.grid-line {
-  stroke: #eee;
-  stroke-width: 0.5;
-}
 
 
 .attributions {
     text-align: left;
     font-style: italic;
     font-size: 0.8em;
-    font-family: var(--font-family) /* "Lucinda Grande", "Lucinda Sans Unicode", Helvetica, Arial, Verdana, sans-serif; */
+    font-family: var(--font-family), serif;
 }
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
