@@ -12,7 +12,7 @@
     --bg-card: #ffffff;
     --text: #404040;
     --text-heading: #0a0a0a;
-    --text-background: #dfdfdf;
+    --text-background: #bfbebe;
     --text-muted: #717171;
     --border: #e5e5e5;
     --border-light: #f5f5f5;
@@ -159,6 +159,7 @@
 .hero-content h1 {
   margin: 0 0 4px 0;
   font-size: 1.75rem;
+  font-weight: 600;
 }
 .description {
   max-width: 600px;
@@ -280,7 +281,7 @@ main {
 }
 .peak-x-1, .peak-x-2 {
   stroke: var(--text-background);
-  stroke-width: 1.1;
+  stroke-width: 0.7;
   pointer-events: none; /* Let the hitbox handle events */
   display: none;
 }
@@ -299,9 +300,33 @@ main {
 }
 .label {
   font-size: 8px;
-  fill: var(--text-background);
+  font-weight: normal;
+  font-family: var(--font-mono), monospace;
   pointer-events: none;
   user-select: none;
+  display: none;
+}
+.label-bg {
+  fill: var(--bg-alt);
+  opacity: 0.7;
+  display: none;
+  pointer-events: none;
+}
+.peak-group.hovered .peak-x-1,
+.peak-group.hovered .peak-x-2,
+.peak-group.hovered .label,
+.peak-group.hovered .label-bg {
+  display: block;
+}
+
+.peak-group.hovered .peak-x-1,
+.peak-group.hovered .peak-x-2 {
+  stroke: var(--text-background);
+}
+
+.peak-group.hovered .label {
+  fill: var(--text-background);
+  font-family: var(--font-mono), monospace;
 }
 
 
