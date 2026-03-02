@@ -134,9 +134,45 @@ Promise.all([
     // const tooltip = d3.select("#tooltip");
 
     // Draw peaks
+    const nodes = peaks.map((d, i) => ({
+      id: i,
+      x: xScale(d.w1),
+      y: yScale(d.w2),
+      fx: xScale(d.w1), // fixed x for peak center
+      fy: yScale(d.w2), // fixed y for peak center
+      assignment: d.assignment,
+      w1: d.w1,
+      w2: d.w2
+    }));
+
+    const labelNodes = peaks.map((d, i) => ({
+      id: i,
+      x: xScale(d.w1) + 10,
+      y: yScale(d.w2) - 10,
+      targetX: xScale(d.w1),
+      targetY: yScale(d.w2),
+      assignment: d.assignment
+    }));
+
+    // Use d3-force to avoid label overlap
+    // Since we only show them on hover, maybe we want them pre-positioned or 
+    // we want them all visible? The user said "make the text labels dodge all other elements".
+    // Usually this means they are all visible or we want a stable position.
+    // Let's assume we want to pre-calculate positions for all labels so they don't overlap 
+    // when they *do* appear (or if the user decides to make them all visible later).
+
+    const simulation = d3.forceSimulation(labelNodes)
+      .force("x", d3.forceX(d => d.targetX).strength(0.8))
+      .force("y", d3.forceY(d => d.targetY).strength(0.8))
+      .force("collide", d3.forceCollide(12)) // Approx label width/height
+      .stop();
+
+    // Run simulation to convergence
+    for (let i = 0; i < 120; ++i) simulation.tick();
+
     const peakGroups = svg
       .selectAll(".peak-group")
-      .data(peaks)
+      .data(labelNodes)
       .enter()
       .append("g")
       .attr("class", "peak-group");
@@ -144,24 +180,24 @@ Promise.all([
     peakGroups
       .append("line")
       .attr("class", "peak-x-1")
-      .attr("x1", (d) => xScale(d.w1) - peakSize)
-      .attr("y1", (d) => yScale(d.w2) - peakSize)
-      .attr("x2", (d) => xScale(d.w1) + peakSize)
-      .attr("y2", (d) => yScale(d.w2) + peakSize);
+      .attr("x1", (d) => d.targetX - peakSize)
+      .attr("y1", (d) => d.targetY - peakSize)
+      .attr("x2", (d) => d.targetX + peakSize)
+      .attr("y2", (d) => d.targetY + peakSize);
 
     peakGroups
       .append("line")
       .attr("class", "peak-x-2")
-      .attr("x1", (d) => xScale(d.w1) + peakSize)
-      .attr("y1", (d) => yScale(d.w2) - peakSize)
-      .attr("x2", (d) => xScale(d.w1) - peakSize)
-      .attr("y2", (d) => yScale(d.w2) + peakSize);
+      .attr("x1", (d) => d.targetX + peakSize)
+      .attr("y1", (d) => d.targetY - peakSize)
+      .attr("x2", (d) => d.targetX - peakSize)
+      .attr("y2", (d) => d.targetY + peakSize);
 
     peakGroups
       .append("rect")
       .attr("class", "peak-hitbox")
-      .attr("x", (d) => xScale(d.w1) - peakSize*2)
-      .attr("y", (d) => yScale(d.w2) - peakSize*2)
+      .attr("x", (d) => d.targetX - peakSize*2)
+      .attr("y", (d) => d.targetY - peakSize*2)
       .attr("width", 12)
       .attr("height", 12)
       .style("fill", "transparent")
@@ -171,32 +207,18 @@ Promise.all([
         const group = d3.select(this.parentNode);
         group.selectAll("line").style("display", "block").transition().duration(200).style("stroke-width", 3);
         group.select(".label").style("display", "block");
-        
-        // tooltip
-        //   .style("display", "block")
-        //   .html(
-        //     `<strong>${d.assignment}</strong><br/>N: ${d.w1.toFixed(1)} ppm<br/>H: ${d.w2.toFixed(2)} ppm`,
-        //   );
-      })
-      .on("mousemove", function (event) {
-        // Use clientX/Y and subtract container offset for tooltip positioning relative to the container
-        // const container = document.getElementById("plot-container").getBoundingClientRect();
-        // tooltip
-        //   .style("left", event.clientX - container.left + 15 + "px")
-        //   .style("top", event.clientY - container.top - 28 + "px");
       })
       .on("mouseout", function () {
         const group = d3.select(this.parentNode);
         group.selectAll("line").style("display", "none").transition().duration(200).style("stroke-width", 1.5);
         group.select(".label").style("display", "none");
-        // tooltip.style("display", "none");
       });
 
     peakGroups
       .append("text")
       .attr("class", "label")
-      .attr("x", (d) => xScale(d.w1) + 7)
-      .attr("y", (d) => yScale(d.w2) - 7)
+      .attr("x", (d) => d.x)
+      .attr("y", (d) => d.y)
       .style("display", "none")
       .text((d) => d.assignment);
   })
