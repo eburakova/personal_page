@@ -264,7 +264,7 @@ main {
   stroke: var(--text-background);
   stroke-width: 1.1;
   pointer-events: none; /* Let the hitbox handle events */
-  display: none;
+  /* display: none; */
 }
 
 .contour-level-1 {
@@ -284,6 +284,17 @@ main {
   fill: var(--text-background);
   pointer-events: none;
   user-select: none;
+}
+.peak-group.hovered .peak-x-1,
+.peak-group.hovered .peak-x-2,
+.peak-group.hovered .label {
+  fill: #444;
+  stroke: #444;
+}
+
+.peak-group.hovered .peak-connector {
+  fill: #444;
+  opacity: 0.6;
 }
 
 

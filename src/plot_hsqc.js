@@ -154,21 +154,192 @@ Promise.all([
       assignment: d.assignment
     }));
 
-    // Use d3-force to avoid label overlap
-    // Since we only show them on hover, maybe we want them pre-positioned or 
-    // we want them all visible? The user said "make the text labels dodge all other elements".
-    // Usually this means they are all visible or we want a stable position.
-    // Let's assume we want to pre-calculate positions for all labels so they don't overlap 
-    // when they *do* appear (or if the user decides to make them all visible later).
+    // Estimate label bounding radius for collisions (approximate text box)
+    // Assume ~6px height and ~4px per character width
 
-    const simulation = d3.forceSimulation(labelNodes)
-      .force("x", d3.forceX(d => d.targetX).strength(0.8))
-      .force("y", d3.forceY(d => d.targetY).strength(0.8))
-      .force("collide", d3.forceCollide(12)) // Approx label width/height
-      .stop();
 
-    // Run simulation to convergence
-    for (let i = 0; i < 120; ++i) simulation.tick();
+      /*
+
+============= Good default avoidance parameters: ===============
+
+Label Repulsion: 4
+Connector <-> connector ... 0.3
+Contour avoidance 0.9
+Avoid other connnectors: 1.2
+Avoid own peak: 4
+Attraction to target: 1
+Collision: 0.2 (0.1-0.4)
+
+      */
+
+    labelNodes.forEach(n => {
+      const w = Math.max(12, 4 * n.assignment.length);
+      const h = 8; // css .label font-size ~8px
+      n.radius = Math.sqrt((w * 0.5) ** 2 + (h * 0.5) ** 2);
+    });
+
+    // Obstacles for labels to avoid: fixed peak centers
+    const obstacles = nodes.map(n => ({
+      x: n.fx,
+      y: n.fy,
+      fx: n.fx,
+      fy: n.fy,
+      radius: 10
+    }));
+
+    // Function to run force layout for labels with configurable repulsion (collision radius)
+    function layoutLabels(
+      repulsionPx = 4,
+      connectorRepulsionStrength = 0.3,
+      contoursStrength = 0.9,
+      connectorsAvoidStrength = 1.2,
+      avoidAnchorStrength = 4,
+      attractStrength = 1,
+      collideStrength = 0.2
+    ) {
+      const simNodes = labelNodes.concat(obstacles);
+      
+      // Custom force to avoid contours
+      // We'll use the normalized spectrum data to push nodes away from high intensity areas
+      function forceContours() {
+        const strength = contoursStrength;
+        for (let i = 0, n = labelNodes.length; i < n; ++i) {
+          const node = labelNodes[i];
+          
+          const ppmN = xScale.invert(node.x);
+          const ppmH = yScale.invert(node.y);
+          const sY = Math.round(specYScale.invert(ppmN));
+          const sX = Math.round(specXScale.invert(ppmH));
+          
+          if (sY >= 0 && sY < specHeight && sX >= 0 && sX < specWidth) {
+            const intensity = Math.abs(spectrum[sY][sX]) / maxVal;
+            if (intensity > 0.05) { // Only penalize if above some threshold
+              const dx = node.x - node.targetX;
+              const dy = node.y - node.targetY;
+              const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+              const push = intensity * strength;
+              node.vx += (dx / dist) * push;
+              node.vy += (dy / dist) * push;
+            }
+          }
+        }
+      }
+
+      // Custom force to avoid connectors (line segments between label and its peak)
+      function forceConnectors(alpha) {
+        const strength = connectorsAvoidStrength;
+        const padding = 5; // Distance to maintain from any connector
+        
+        for (let i = 0, n = labelNodes.length; i < n; ++i) {
+          const node = labelNodes[i];
+          
+          // Each label should avoid ALL other connectors
+          for (let j = 0, m = labelNodes.length; j < m; ++j) {
+            if (i === j) continue; // Don't avoid your own connector
+            
+            const other = labelNodes[j];
+            const dx_conn = other.targetX - other.x;
+            const dy_conn = other.targetY - other.y;
+            const dist_conn = Math.sqrt(dx_conn * dx_conn + dy_conn * dy_conn);
+            
+            // Only avoid if the connector is actually visible (above threshold)
+            if (dist_conn < 20) continue; 
+            
+            // Find point on connector closest to current node
+            // Connector is a segment from (other.x, other.y) to (other.targetX, other.targetY)
+            const t = Math.max(0, Math.min(1, ((node.x - other.x) * dx_conn + (node.y - other.y) * dy_conn) / (dist_conn * dist_conn)));
+            const closestX = other.x + t * dx_conn;
+            const closestY = other.y + t * dy_conn;
+            
+            const dx = node.x - closestX;
+            const dy = node.y - closestY;
+            const distSq = dx * dx + dy * dy;
+            const minDist = padding + node.radius;
+            
+            if (distSq < minDist * minDist) {
+              const dist = Math.sqrt(distSq) || 0.001;
+              const push = (minDist - dist) / minDist;
+              node.vx += (dx / dist) * push * strength * alpha;
+              node.vy += (dy / dist) * push * strength * alpha;
+            }
+          }
+        }
+      }
+
+      // Custom force to make connectors repel each other
+      function forceConnectorRepulsion(alpha) {
+        const strength = connectorRepulsionStrength;
+        const threshold = 20; // Connector visibility threshold
+
+        for (let i = 0, n = labelNodes.length; i < n; ++i) {
+          const nodeI = labelNodes[i];
+          const dxI = nodeI.targetX - nodeI.x;
+          const dyI = nodeI.targetY - nodeI.y;
+          const distI = Math.sqrt(dxI * dxI + dyI * dyI);
+          if (distI < threshold) continue;
+
+          for (let j = i + 1, m = labelNodes.length; j < m; ++j) {
+            const nodeJ = labelNodes[j];
+            const dxJ = nodeJ.targetX - nodeJ.x;
+            const dyJ = nodeJ.targetY - nodeJ.y;
+            const distJ = Math.sqrt(dxJ * dxJ + dyJ * dyJ);
+            if (distJ < threshold) continue;
+
+            // Simplified repulsion: push label endpoints away if segments are too close
+            // We'll check the distance between the midpoints of the connectors
+            const midXI = (nodeI.x + nodeI.targetX) / 2;
+            const midYI = (nodeI.y + nodeI.targetY) / 2;
+            const midXJ = (nodeJ.x + nodeJ.targetX) / 2;
+            const midYJ = (nodeJ.y + nodeJ.targetY) / 2;
+
+            const dx = midXI - midXJ;
+            const dy = midYI - midYJ;
+            const distSq = dx * dx + dy * dy;
+            const minDist = 20; // Repulsion distance between midpoints
+
+            if (distSq < minDist * minDist) {
+              const dist = Math.sqrt(distSq) || 0.001;
+              const push = (minDist - dist) / dist * strength * alpha;
+              
+              // Only move the labels (x, y) not the fixed targets
+              nodeI.vx += dx * push;
+              nodeI.vy += dy * push;
+              nodeJ.vx -= dx * push;
+              nodeJ.vy -= dy * push;
+            }
+          }
+        }
+      }
+
+      const simulation = d3.forceSimulation(simNodes)
+        .force("x", d3.forceX(d => (d.targetX !== undefined ? d.targetX : d.fx)).strength(attractStrength))
+        .force("y", d3.forceY(d => (d.targetY !== undefined ? d.targetY : d.fy)).strength(attractStrength))
+        .force("collide", d3.forceCollide(d => (d.fx === undefined ? (d.radius + repulsionPx) : d.radius)).strength(collideStrength))
+        .force("contours", forceContours)
+        .force("connectors", forceConnectors)
+        .force("connectorRepulsion", forceConnectorRepulsion)
+        .force("avoidAnchor", (alpha) => {
+          const minDist = 7 + repulsionPx; // minimum px away from its own peak
+          for (let i = 0, n = labelNodes.length; i < n; ++i) {
+            const node = labelNodes[i];
+            const dx = node.x - node.targetX;
+            const dy = node.y - node.targetY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            if (!dist) dist = 0.001;
+            if (dist < minDist) {
+              const k = (minDist - dist) / minDist;
+              node.vx += (dx / dist) * k * avoidAnchorStrength * alpha;
+              node.vy += (dy / dist) * k * avoidAnchorStrength * alpha;
+            }
+          }
+        })
+        .stop();
+        
+      for (let i = 0; i < 150; ++i) simulation.tick();
+    }
+
+    // Initial layout with default repulsion
+    layoutLabels(4, 0.3, 0.9, 1.2, 4, 1, 0.2);
 
     const peakGroups = svg
       .selectAll(".peak-group")
@@ -205,13 +376,68 @@ Promise.all([
       .style("cursor", "pointer")
       .on("mouseover", function (event, d) {
         const group = d3.select(this.parentNode);
-        group.selectAll("line").style("display", "block").transition().duration(200).style("stroke-width", 3);
-        group.select(".label").style("display", "block");
+
+        // Bring to front to simulate high z-order
+        group.raise();
+
+        group.classed("hovered", true);
+        group.selectAll("line").transition().duration(200).style("stroke-width", 3);
+
+        // Transition label closer to its peak over 0.5s
+        const moveScale = 0.5; // move 50% closer to the peak
+        const targetX = d.targetX;
+        const targetY = d.targetY;
+        const startX = d.x;
+        const startY = d.y;
+        const endX = startX + (targetX - startX) * moveScale;
+        const endY = startY + (targetY - startY) * moveScale;
+
+        group.select(".label")
+          .transition()
+          .duration(500)
+          .attr("x", endX)
+          .attr("y", endY);
+
+        // Update connector accordingly
+        group.select(".peak-connector")
+          .transition()
+          .duration(500)
+          .attrTween("d", function() {
+            return function(t) {
+              const currentX = startX + (endX - startX) * t;
+              const currentY = startY + (endY - startY) * t;
+              return calculateConnectorPath({ ...d, x: currentX, y: currentY });
+            };
+          });
       })
-      .on("mouseout", function () {
+      .on("mouseout", function (event, d) {
         const group = d3.select(this.parentNode);
-        group.selectAll("line").style("display", "none").transition().duration(200).style("stroke-width", 1.5);
-        group.select(".label").style("display", "none");
+        group.classed("hovered", false);
+        group.selectAll("line").transition().duration(200).style("stroke-width", 1.5);
+
+        // Transition label back to original position
+        group.select(".label")
+          .transition()
+          .duration(500)
+          .attr("x", d.x)
+          .attr("y", d.y);
+
+        // Update connector back
+        const targetX = d.targetX;
+        const targetY = d.targetY;
+        const startX = group.select(".label").attr("x");
+        const startY = group.select(".label").attr("y");
+
+        group.select(".peak-connector")
+          .transition()
+          .duration(500)
+          .attrTween("d", function() {
+            return function(t) {
+              const currentX = +startX + (d.x - startX) * t;
+              const currentY = +startY + (d.y - startY) * t;
+              return calculateConnectorPath({ ...d, x: currentX, y: currentY });
+            };
+          });
       });
 
     peakGroups
@@ -219,8 +445,156 @@ Promise.all([
       .attr("class", "label")
       .attr("x", (d) => d.x)
       .attr("y", (d) => d.y)
-      .style("display", "none")
+      // .style("display", "none")
       .text((d) => d.assignment);
+
+    // Connector: thin triangle pointing from label to cross
+    peakGroups
+      .insert("path", ".label") // insert before text
+      .attr("class", "peak-connector")
+      .style("fill", "#888")
+      .style("opacity", 0.4)
+      .style("pointer-events", "none");
+
+    const distanceThreshold = 20;
+
+    function calculateConnectorPath(d) {
+      const dx = d.targetX - d.x;
+      const dy = d.targetY - d.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < distanceThreshold) return null;
+
+      // Estimate label dimensions
+      const w = Math.max(12, 4 * d.assignment.length);
+      const h = 8; // font-size
+
+      const cx = d.x + w / 2;
+      const cy = d.y - h / 2;
+
+      const vdx = d.targetX - cx;
+      const vdy = d.targetY - cy;
+      const angle = Math.atan2(vdy, vdx);
+
+      let intersectionX = cx;
+      let intersectionY = cy;
+
+      const absCos = Math.abs(Math.cos(angle));
+      const absSin = Math.abs(Math.sin(angle));
+
+      if (w * absSin <= h * absCos) {
+        const signX = Math.cos(angle) > 0 ? 1 : -1;
+        intersectionX = cx + signX * (w / 2);
+        intersectionY = cy + signX * (w / 2) * Math.tan(angle);
+      } else {
+        const signY = Math.sin(angle) > 0 ? 1 : -1;
+        const tanA = Math.tan(angle);
+        intersectionX = cx + (tanA === 0 ? 0 : (signY * (h / 2) / tanA));
+        intersectionY = cy + signY * (h / 2);
+      }
+
+      const baseWidth = 4;
+      
+      const x1 = intersectionX + Math.cos(angle + Math.PI/2) * (baseWidth/2);
+      const y1 = intersectionY + Math.sin(angle + Math.PI/2) * (baseWidth/2);
+      const x2 = intersectionX + Math.cos(angle - Math.PI/2) * (baseWidth/2);
+      const y2 = intersectionY + Math.sin(angle - Math.PI/2) * (baseWidth/2);
+      const x3 = d.targetX;
+      const y3 = d.targetY;
+      
+      return `M${x1},${y1} L${x2},${y2} L${x3},${y3} Z`;
+    }
+
+    function updateConnectors() {
+      svg.selectAll(".peak-connector")
+        .data(labelNodes)
+        .attr("d", d => calculateConnectorPath(d));
+    }
+
+    // Hook up repulsion sliders if present (standalone spectrum page only)
+    const repulsionSlider = document.getElementById("repulsion-slider");
+    const repulsionValue = document.getElementById("repulsion-value");
+
+    const connSlider = document.getElementById("connector-repulsion-slider");
+    const connValue = document.getElementById("connector-repulsion-value");
+
+    // Additional strength sliders (standalone page only)
+    const contoursSlider = document.getElementById("contours-strength-slider");
+    const contoursValue = document.getElementById("contours-strength-value");
+
+    const connectorsAvoidSlider = document.getElementById("connectors-avoid-strength-slider");
+    const connectorsAvoidValue = document.getElementById("connectors-avoid-strength-value");
+
+    const avoidAnchorSlider = document.getElementById("avoid-anchor-strength-slider");
+    const avoidAnchorValue = document.getElementById("avoid-anchor-strength-value");
+
+    const attractSlider = document.getElementById("attract-strength-slider");
+    const attractValue = document.getElementById("attract-strength-value");
+
+    const collideSlider = document.getElementById("collide-strength-slider");
+    const collideValue = document.getElementById("collide-strength-value");
+
+    if (repulsionSlider) {
+      const apply = () => {
+        const r = +repulsionSlider.value;
+        const cr = connSlider ? +connSlider.value : 0.3;
+
+        const cs = contoursSlider ? +contoursSlider.value : 1.0;
+        const ca = connectorsAvoidSlider ? +connectorsAvoidSlider.value : 0.5;
+        const aas = avoidAnchorSlider ? +avoidAnchorSlider.value : 2.0;
+        const as = attractSlider ? +attractSlider.value : 0.5;
+        const cols = collideSlider ? +collideSlider.value : 1.0;
+
+        if (repulsionValue) repulsionValue.textContent = String(r);
+        if (connValue) connValue.textContent = String(cr);
+        if (contoursValue) contoursValue.textContent = String(cs);
+        if (connectorsAvoidValue) connectorsAvoidValue.textContent = String(ca);
+        if (avoidAnchorValue) avoidAnchorValue.textContent = String(aas);
+        if (attractValue) attractValue.textContent = String(as);
+        if (collideValue) collideValue.textContent = String(cols);
+
+        layoutLabels(r, cr, cs, ca, aas, as, cols);
+        // Update label positions and connectors in the DOM
+        svg.selectAll(".label")
+          .data(labelNodes)
+          .attr("x", d => d.x)
+          .attr("y", d => d.y);
+          
+        updateConnectors();
+      };
+      // Initialize and listen for changes
+      apply();
+      repulsionSlider.addEventListener("input", apply);
+      repulsionSlider.addEventListener("change", apply);
+      if (connSlider) {
+        connSlider.addEventListener("input", apply);
+        connSlider.addEventListener("change", apply);
+      }
+      // Wire up additional sliders
+      if (contoursSlider) {
+        contoursSlider.addEventListener("input", apply);
+        contoursSlider.addEventListener("change", apply);
+      }
+      if (connectorsAvoidSlider) {
+        connectorsAvoidSlider.addEventListener("input", apply);
+        connectorsAvoidSlider.addEventListener("change", apply);
+      }
+      if (avoidAnchorSlider) {
+        avoidAnchorSlider.addEventListener("input", apply);
+        avoidAnchorSlider.addEventListener("change", apply);
+      }
+      if (attractSlider) {
+        attractSlider.addEventListener("input", apply);
+        attractSlider.addEventListener("change", apply);
+      }
+      if (collideSlider) {
+        collideSlider.addEventListener("input", apply);
+        collideSlider.addEventListener("change", apply);
+      }
+    } else {
+      // For main page without slider
+      updateConnectors();
+    }
   })
   .catch((error) => {
     console.error("Error loading data:", error);
